@@ -3,7 +3,7 @@ from typing import List
 from csv import writer
 
 # ------------------------------ Constants ----------------------------------- #
-HEADER    = ["Índice", "CPU (%)", "Memória RAM (%)"]
+HEADER    = ["Tempo", "CPU", "Memória"]
 DIRECTORY = "csv-files"
 # ---------------------------------------------------------------------------- #
 
