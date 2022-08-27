@@ -19,6 +19,3 @@ def cpuUsageCheck(rounding_number: int = 2) -> float:
     cpu_usage_percentage:float = round((load15/cpu_count()) * 100, rounding_number)
 
     return cpu_usage_percentage
-
-# def containerCpuUsageCheck(rounding_number: int = 2) -> float:
-    
