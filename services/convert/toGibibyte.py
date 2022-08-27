@@ -26,8 +26,11 @@ def toGibibyte(value: str) -> str:
     if (value.find("KiB") != -1): # Se o valor for dado em KiB
         valueConverted: str = f"{round(temp / 1048576, ROUNDING_NUMBER)}GiB"
     elif (value.find("MiB") != -1): # Se o valor for dado em MiB
-        print(f"A {temp}")
         valueConverted: str = f"{round(temp / 1024, ROUNDING_NUMBER)}GiB"
+    else:
+        print("Error! not known unit measure.")
+        
+        return value
 
     return valueConverted
 
