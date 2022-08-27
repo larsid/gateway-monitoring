@@ -22,7 +22,7 @@ def getContainerIds(image_name: str) -> List[str]:
     try:
         output = run(["docker", "ps"]).output
     except:
-        print("Erro ao tentar listar os containers! Verifique se o Docker está executando.")
+        print("Error trying to list containers! Make sure Docker is on.")
         exit()
     else:
         # Sanitizando o retorno do comando.
