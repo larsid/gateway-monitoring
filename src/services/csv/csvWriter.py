@@ -1,10 +1,16 @@
+from os import getenv
 from io import TextIOWrapper
 from typing import List
 from csv import writer
+from dotenv import load_dotenv
+from json import loads
+
+# Permite a leitura do arquivo .env
+load_dotenv()
 
 # ------------------------------ Constants ----------------------------------- #
-HEADER    = ["Tempo", "CPU", "Memória"]
-DIRECTORY = "csv-files"
+HEADER    = loads(getenv("HEADER"))
+DIRECTORY = "src/csv-files"
 # ---------------------------------------------------------------------------- #
 
 class CsvWriter:

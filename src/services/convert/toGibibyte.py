@@ -1,4 +1,4 @@
-from re import findall
+from re import findall, search
 
 # ------------------------------ Constants ----------------------------------- #
 ROUNDING_NUMBER = 2
@@ -20,8 +20,12 @@ def toGibibyte(value: str) -> str:
     if (value.find("GiB") != -1):
         return value
 
-    # Pegando somente a parte racional da String.
-    temp: int = float(findall("\d+\.\d+", value)[-1])
+    if (value.find(".") != -1):
+        # Pegando somente a parte racional da String.
+        temp: float = float(findall("\d+\.\d+", value)[-1])
+    else:
+        # Pegando somente a parte inteira da String.
+        temp:int = int(search(r'\d+', value).group())
 
     if (value.find("KiB") != -1): # Se o valor for dado em KiB
         valueConverted: str = f"{round(temp / 1048576, ROUNDING_NUMBER)}GiB"

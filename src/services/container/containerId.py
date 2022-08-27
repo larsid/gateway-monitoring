@@ -3,13 +3,13 @@ from sys import exit
 from re import sub
 from command import run
 
-def getContainerIds(image_name: str) -> List[str]:
+def getContainerIds(image_names: list) -> List[str]:
     """ Retorna uma lista contendo os Ids dos containers com base no nome de
     uma imagem
 
     Parameters
     ----------
-    image_name: :class:`str`
+    image_name: :class:`List[str]`
         Nome da imagem sem a TAG.
 
     Returns
@@ -36,7 +36,8 @@ def getContainerIds(image_name: str) -> List[str]:
         container_lines.pop(0)
 
         for container_line in container_lines:
-            if(container_line.find(image_name) != -1):
-                container_ids.append(container_line.split(" ")[0])
+            for image_name in image_names:
+                if(container_line.find(image_name) != -1):
+                    container_ids.append(container_line.split(" ")[0])
 
         return container_ids
