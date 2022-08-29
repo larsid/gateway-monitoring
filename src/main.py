@@ -5,21 +5,29 @@ from dotenv import load_dotenv
 from json import loads
 from threading import Thread, Lock
 
-from services import CsvWriter, getContainerIds, getContainerStats
+from services import CsvWriter, getContainerIds, getContainerStats, runDockerStats
 
 # Permite a leitura do arquivo .env
 load_dotenv()
 
 # ------------------------------ Constants ----------------------------------- #
-SLEEP_TIME_IN_SECONDS = int(getenv("SLEEP_TIME_IN_SECONDS"))
-IMAGE_NAME            = loads(getenv("IMAGE_NAMES"))
+SLEEP_CSV_WRITER_THREAD = int(getenv("SLEEP_CSV_WRITER_THREAD"))
+SLEEP_STATS_THREAD      = int(getenv("SLEEP_STATS_THREAD"))
+IMAGE_NAME              = loads(getenv("IMAGE_NAMES"))
 # ---------------------------------------------------------------------------- #
 
+# Thread para aguar comandos do teclado e finalizar as demais.
 class managerThread(Thread):
     def __init__(self):
+        """ Método construtor.
+        """
+
         Thread.__init__(self)
       
     def run(self):
+        """ Método de execução da thread.
+        """
+        
         global is_running
         is_running = True
 
@@ -28,12 +36,54 @@ class managerThread(Thread):
         
         print("Manager finalizado")
     
-class thread(Thread):
+# Thread para executar o comando docker stats e atualizar a variável output.
+class statsThread(Thread):
     __mgr = managerThread() 
     __mgr.start()
     running = True
 
-    def __init__(self, file_name, container_id):
+    def __init__(self):
+        """ Método construtor.
+        """
+        
+        self.lock = Lock()
+
+        Thread.__init__(self)
+
+    def run(self):
+        """ Método de execução da thread.
+        """
+        
+        while (is_running):
+            self.lock.acquire()
+            
+            global output
+            output = runDockerStats()
+
+            sleep(SLEEP_STATS_THREAD)
+            self.lock.release()
+
+        self.running = False
+        self.__mgr.join()
+
+        print("Manager parado")
+
+class threadCsvWriter(Thread):
+    __mgr = managerThread() 
+    __mgr.start()
+    running = True
+
+    def __init__(self, file_name: str, container_id: str):
+        """ Método construtor.
+
+        Parameters
+        ----------
+        file_name: :class:`str`
+            Nome do arquivo que será escrito.
+        container_id: :class:`str`
+            ID do container que será monitorado.
+        """
+
         self.csv: CsvWriter    = CsvWriter(file_name)
         self.container_id: str = container_id
         self.lock = Lock()
@@ -41,23 +91,24 @@ class thread(Thread):
         Thread.__init__(self)
 
     def run(self):
-        global is_running
-        
+        """ Método de execução da thread.
+        """
+
         index: int = 0
         
         while (is_running):
             index += 1
 
             self.lock.acquire()
-            container_stat: Dict[str, str] = getContainerStats(self.container_id)
-            # TODO Executar o comando desse método somente uma vez, e passar seu retorno para esse método.
+            
+            container_stat: Dict[str, str] = getContainerStats(output, self.container_id)
 
             self.csv.write_row(
                 data  = [index, container_stat["cpu"], container_stat["memory"]],
                 debug = True
             )
             
-            sleep(SLEEP_TIME_IN_SECONDS)
+            sleep(SLEEP_CSV_WRITER_THREAD)
             self.lock.release()
         
         self.running = False
@@ -66,10 +117,20 @@ class thread(Thread):
         print("Manager parado")
 
 if __name__ == "__main__":    
-    threads = {}
+    threads_csv_writer = {}
 
     container_ids: List[str] = getContainerIds(IMAGE_NAME)
 
+    stats_thread = statsThread()
+    stats_thread.start()
+    
+    # Tempo de espera para a primeira execução do comando docker stats.
+    sleep(5)
+
     for index in range(len(container_ids)):
-        threads[index] = thread(f"file{index}", container_ids[index])
-        threads[index].start()
+        threads_csv_writer[index] = threadCsvWriter(
+            file_name    = f"file{index}", 
+            container_id = container_ids[index]
+            )
+            
+        threads_csv_writer[index].start()
