@@ -3,6 +3,7 @@ from typing import Dict, List
 from time import sleep
 from dotenv import load_dotenv
 from json import loads
+from threading import Thread
 
 from services import CsvWriter, getContainerIds, getContainerStats
 
@@ -14,23 +15,57 @@ SLEEP_TIME_IN_SECONDS = int(getenv("SLEEP_TIME_IN_SECONDS"))
 IMAGE_NAME            = loads(getenv("IMAGE_NAMES"))
 # ---------------------------------------------------------------------------- #
 
-if __name__ == "__main__":
-    csv: CsvWriter = CsvWriter()
+class managerThread(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+      
+    def run(self):
+        global is_running
+        is_running = True
 
-    index: int = 0
-
-    while(True):
-        index += 1
-
-        container_stat: Dict[str, str] = {}
-        container_ids: List[str] = getContainerIds(IMAGE_NAME)
-
-        for container_id in container_ids:
-            container_stat = getContainerStats(container_id)
-
-        csv.write_row(
-            data  = [index, container_stat["cpu"], container_stat["memory"]],
-            debug = True
-        )
+        input("Pressione qualquer tecla+enter para finalizar: \n")
+        is_running = False
         
-        sleep(SLEEP_TIME_IN_SECONDS)
+        print("Manager finalizado")
+    
+class thread(Thread):
+    __mgr = managerThread() 
+    __mgr.start()
+    running = True
+
+    def __init__(self, file_name, container_id):
+        self.csv: CsvWriter    = CsvWriter(file_name)
+        self.container_id: str = container_id
+        
+        Thread.__init__(self)
+
+    def run(self):
+        global is_running
+        
+        index: int = 0
+        
+        while (is_running):
+            index += 1
+
+            container_stat: Dict[str, str] = getContainerStats(self.container_id)
+
+            self.csv.write_row(
+                data  = [index, container_stat["cpu"], container_stat["memory"]],
+                debug = True
+            )
+            
+            sleep(SLEEP_TIME_IN_SECONDS)
+        
+        self.running = False
+        self.__mgr.join()
+
+        print("Manager parado")
+
+if __name__ == "__main__":    
+    threads = {}
+
+    container_ids: List[str] = getContainerIds(IMAGE_NAME)
+
+    for index in range(len(container_ids)):
+        threads[index] = thread(f"file{index}", container_ids[index])
+        threads[index].start()
