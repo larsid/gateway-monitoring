@@ -3,7 +3,7 @@ from typing import Dict, List
 from time import sleep
 from dotenv import load_dotenv
 from json import loads
-from threading import Thread
+from threading import Thread, Lock
 
 from services import CsvWriter, getContainerIds, getContainerStats
 
@@ -36,6 +36,7 @@ class thread(Thread):
     def __init__(self, file_name, container_id):
         self.csv: CsvWriter    = CsvWriter(file_name)
         self.container_id: str = container_id
+        self.lock = Lock()
         
         Thread.__init__(self)
 
@@ -47,7 +48,9 @@ class thread(Thread):
         while (is_running):
             index += 1
 
+            self.lock.acquire()
             container_stat: Dict[str, str] = getContainerStats(self.container_id)
+            # TODO Executar o comando desse método somente uma vez, e passar seu retorno para esse método.
 
             self.csv.write_row(
                 data  = [index, container_stat["cpu"], container_stat["memory"]],
@@ -55,6 +58,7 @@ class thread(Thread):
             )
             
             sleep(SLEEP_TIME_IN_SECONDS)
+            self.lock.release()
         
         self.running = False
         self.__mgr.join()
