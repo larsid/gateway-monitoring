@@ -28,8 +28,8 @@ def getContainerStats(container_id: str) -> Dict[str, str]:
     container_stat: Dict[str, str] = {}
 
     try:
-        output = run(["docker", "stats", "--no-stream", "-a"]).output
-    except:
+        output = run(["docker", "stats", "--no-stream"]).output
+    except:   
         print("Erro ao tentar verificar o estado do container! Verifique se o Docker está executando.")
         exit()
     else:
