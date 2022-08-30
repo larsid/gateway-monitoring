@@ -9,8 +9,8 @@ def getContainerIds(image_names: list) -> List[str]:
 
     Parameters
     ----------
-    image_name: :class:`List[str]`
-        Nome da imagem sem a TAG.
+    image_names: :class:`List[str]`
+        Lista com os nome da imagens sem a TAG.
 
     Returns
     -------
