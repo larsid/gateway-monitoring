@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from json import loads
 from threading import Thread, Lock
 
-from services import CsvWriter, getContainerIds, getContainerStats, runDockerStats
+from services import CsvWriter, getContainerIds, getContainerStats, runDockerStats, getGatewayLoadRate
 
 # Permite a leitura do arquivo .env
 load_dotenv()
@@ -102,9 +102,15 @@ class threadCsvWriter(Thread):
             self.lock.acquire()
             
             container_stat: Dict[str, str] = getContainerStats(output, self.container_id)
+            container_load_rate: str = getGatewayLoadRate(self.container_id)
 
             self.csv.write_row(
-                data  = [index, container_stat["cpu"], container_stat["memory"]],
+                data  = [
+                    index, 
+                    container_load_rate,
+                    container_stat["cpu"], 
+                    container_stat["memory"]
+                ],
                 debug = True
             )
             
