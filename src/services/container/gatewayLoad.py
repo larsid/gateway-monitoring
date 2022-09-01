@@ -23,8 +23,7 @@ def getGatewayLoadRate(container_id: str) -> str:
 
     amount_devices_connected: int = getGatewayDevicesConnected(container_id)
     load_limit: int               = __getLoadLimit(container_id)
-
-    load_rate: float = (amount_devices_connected/load_limit) * 100
+    load_rate: float              = (amount_devices_connected/load_limit) * 100
 
     return f"{load_rate}%"
 
@@ -46,8 +45,8 @@ def getGatewayDevicesConnected(container_id: str) -> int:
         output: str = str(
             Popen(
                 f"docker exec {container_id} cat {MAPPING_DEVICES_FILE_PATH}",
-                stdout=PIPE, 
-                shell=True
+                stdout = PIPE, 
+                shell  = True
             ).communicate()[0]
         )
     except:
@@ -87,8 +86,8 @@ def __getLoadLimit(container_id: str) -> int:
         output: str = str(
             Popen(
                 f"docker exec {container_id} cat {LOAD_MONITOR_FILE_PATH}",
-                stdout=PIPE, 
-                shell=True
+                stdout = PIPE, 
+                shell  = True
             ).communicate()[0]
         )
     except:
