@@ -21,14 +21,14 @@ def getGatewayLoadRate(container_id: str) -> str:
     :class:`str`
     """
 
-    amount_devices_connected: int = __getGatewayDevicesConnected(container_id)
-    load_limit: int = __getLoadLimit(container_id)
+    amount_devices_connected: int = getGatewayDevicesConnected(container_id)
+    load_limit: int               = __getLoadLimit(container_id)
 
     load_rate: float = (amount_devices_connected/load_limit) * 100
 
     return f"{load_rate}%"
 
-def __getGatewayDevicesConnected(container_id: str) -> int:
+def getGatewayDevicesConnected(container_id: str) -> int:
     """ Retorna a quantidade de dispositivos que estão conectados a um 
     determinado gateway.
 
