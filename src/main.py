@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from json import loads
 from threading import Thread, Lock
 
-from services import CsvWriter, getContainerIds, getContainerStats, runDockerStats, getGatewayLoadRate
+from services import CsvWriter, getContainerIds, getContainerStats, runDockerStats, getGatewayLoadRate, getGatewayName
 
 # Permite a leitura do arquivo .env
 load_dotenv()
@@ -73,7 +73,7 @@ class threadCsvWriter(Thread):
     __mgr.start()
     running = True
 
-    def __init__(self, file_name: str, container_id: str):
+    def __init__(self, file_name: str, container_id: str, gateway_index: int):
         """ Método construtor.
 
         Parameters
@@ -84,8 +84,10 @@ class threadCsvWriter(Thread):
             ID do container que será monitorado.
         """
 
-        self.csv: CsvWriter    = CsvWriter(file_name)
-        self.container_id: str = container_id
+        self.csv: CsvWriter     = CsvWriter(file_name)
+        self.container_id: str  = container_id
+        self.gateway_index: int = gateway_index
+        
         self.lock = Lock()
         
         Thread.__init__(self)
@@ -102,14 +104,16 @@ class threadCsvWriter(Thread):
             self.lock.acquire()
             
             container_stat: Dict[str, str] = getContainerStats(output, self.container_id)
-            container_load_rate: str = getGatewayLoadRate(self.container_id)
+            container_load_rate: str       = getGatewayLoadRate(self.container_id)
+            gateway_name: str              = getGatewayName(self.gateway_index)
 
             self.csv.write_row(
-                data  = [
+                data = [
                     index, 
+                    gateway_name,
                     container_load_rate,
+                    container_stat["memory"],
                     container_stat["cpu"], 
-                    container_stat["memory"]
                 ],
                 debug = True
             )
@@ -135,8 +139,9 @@ if __name__ == "__main__":
 
     for index in range(len(container_ids)):
         threads_csv_writer[index] = threadCsvWriter(
-            file_name    = f"file{index}", 
-            container_id = container_ids[index]
-            )
+            file_name     = f"gateway_{index + 1}", 
+            container_id  = container_ids[index],
+            gateway_index = index + 1
+        )
             
         threads_csv_writer[index].start()
