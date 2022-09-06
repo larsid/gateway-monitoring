@@ -25,7 +25,7 @@ def getGatewayLoadRate(container_id: str) -> str:
     load_limit: int               = __getLoadLimit(container_id)
     load_rate: float              = (amount_devices_connected/load_limit) * 100
 
-    return f"{load_rate}%"
+    return f"{round(load_rate, 2)}%"
 
 def getGatewayDevicesConnected(container_id: str) -> int:
     """ Retorna a quantidade de dispositivos que estão conectados a um 
