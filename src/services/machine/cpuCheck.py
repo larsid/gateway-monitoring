@@ -1,21 +1,13 @@
-from os import cpu_count
-from psutil import getloadavg
+from psutil import cpu_percent
 
-def cpuUsageCheck(rounding_number: int = 2) -> float:
+def cpuUsageCheck() -> float:
     """ Retorna a taxa de utilização da CPU em porcentagem.
-
-    Parameters
-    ----------
-    rounding_number: :class:`int`
-        Número máximo de casas de decimais.
 
     Returns
     -------
-    cpu_usage_percentage: :class:`float`
+    cpu_usage_percentage: :class:`str`
     """
-    
-    (load1, load5, load15) = getloadavg()
 
-    cpu_usage_percentage:float = round((load15/cpu_count()) * 100, rounding_number)
+    cpu_usage_percentage: float = cpu_percent()
 
-    return cpu_usage_percentage
+    return f"{cpu_usage_percentage}%"
