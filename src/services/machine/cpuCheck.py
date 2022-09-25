@@ -1,6 +1,6 @@
 from psutil import cpu_percent
 
-def cpuUsageCheck() -> float:
+def cpuUsageCheck() -> str:
     """ Retorna a taxa de utilização da CPU em porcentagem.
 
     Returns
