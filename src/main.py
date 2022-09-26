@@ -108,7 +108,7 @@ class threadCsvWriter(Thread):
             gateway_name: str              = getGatewayName(self.gateway_index)
             amount_connected_devices: int  = getGatewayDevicesConnected(self.container_id)
             machine_memory: str            = memoryUsageCheck()
-            machine_cpu_rate: float        = cpuUsageCheck()
+            machine_cpu_rate: str        = cpuUsageCheck()
 
             self.csv.write_row(
                 data = [
