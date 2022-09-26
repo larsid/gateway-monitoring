@@ -5,7 +5,7 @@ ROUNDING_NUMBER = 2
 # ---------------------------------------------------------------------------- #
 
 def gibibyteToGigabyte(value: str) -> str:
-    """ Converte um valor em Gibibyte para Gigabyte
+    """ Converte um valor em Gibibyte para Gigabyte.
 
     Parameters
     ----------
