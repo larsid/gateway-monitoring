@@ -25,7 +25,7 @@ def toGibibyte(value: str) -> str:
         temp: float = float(findall("\d+\.\d+", value)[-1])
     else:
         # Pegando somente a parte inteira da String.
-        temp:int = int(search(r'\d+', value).group())
+        temp: int = int(search(r'\d+', value).group())
 
     if (value.find("KiB") != -1): # Se o valor for dado em KiB
         valueConverted: str = f"{round(temp / 1048576, ROUNDING_NUMBER)}GiB"
