@@ -4,6 +4,7 @@ from re import sub
 from command import run
 
 from ..convert.toGibibyte import toGibibyte
+from ..convert.gibibyteToGigabyte import gibibyteToGigabyte
 
 # ------------------------------ Constants ----------------------------------- #
 ID_POSITION  = 0
@@ -59,6 +60,6 @@ def getContainerStats(output: str, container_id: str) -> Dict[str, str]:
             
             container_stat["id"]     = container_info[ID_POSITION]
             container_stat["cpu"]    = container_info[CPU_POSITION]
-            container_stat["memory"] = toGibibyte(container_info[MEM_POSITION])
+            container_stat["memory"] = gibibyteToGigabyte(toGibibyte(container_info[MEM_POSITION]))
             
             return container_stat
