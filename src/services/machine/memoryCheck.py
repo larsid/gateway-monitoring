@@ -9,7 +9,7 @@ def memoryUsageCheck() -> str:
     """
 
     (total_memory, used_memory, free_memory) = map(
-        str, popen('free -t -h').readlines()[-1].split()[1:]
+        str, popen('free -h').readlines()[1].split()[1:4]
     )
 
     return used_memory
